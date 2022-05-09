@@ -1,18 +1,18 @@
 import tensorflow as tf
 import argparse
 
-import dqn
-import utils
-from wrappers import monitor, wrap_deepmind
-from q_functions import *
-from replay_memory import make_replay_memory
-from replay_memory_legacy import make_legacy_replay_memory
+from . import dqn
+from . import utils
+from .wrappers import monitor, wrap_deepmind
+from .q_functions import *
+from .replay_memory import make_replay_memory
+from .replay_memory_legacy import make_legacy_replay_memory
 
 
-def make_atari_env(name, seed):
+def make_atari_env(name, seed, ref):
     from gym.envs.atari.atari_env import AtariEnv
     env = AtariEnv(game=name, frameskip=4, obs_type='image')
-    env = monitor(env, name)
+    env = monitor(env, name, ref)
     env = wrap_deepmind(env)
     env.seed(seed)
     return env
@@ -74,8 +74,8 @@ def get_args():
 def main():
     args = get_args()
 
-    env = make_atari_env(args.env, args.seed)
-    benchmark_env = make_atari_env(args.env, args.seed+1)
+    env = make_atari_env(args.env, args.seed, False)
+    benchmark_env = make_atari_env(args.env, args.seed+1, True)
 
     optimizer = tf.train.AdamOptimizer(learning_rate=args.lr, epsilon=1e-4)
 

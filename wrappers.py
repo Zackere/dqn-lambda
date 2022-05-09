@@ -118,17 +118,24 @@ class ProcessFrame84(gym.ObservationWrapper):
         self.observation_space = gym.spaces.Box(low=0, high=255, shape=(84, 84, 1), dtype=np.uint8)
 
     def observation(self, observation):
-        observation = cv2.cvtColor(observation, cv2.COLOR_BGR2GRAY)
-        observation = cv2.resize(observation, (84, 84), interpolation=cv2.INTER_LINEAR)
+        if len(observation) == 3:
+            observation = cv2.cvtColor(observation, cv2.COLOR_BGR2GRAY)
+        observation = cv2.resize(observation, (84, 84), interpolation=cv2.INTER_NEAREST)
         return np.reshape(observation, [84, 84, 1]).astype(np.uint8)
 
 class ClippedRewardsWrapper(gym.RewardWrapper):
+    def __init__(self, env):
+        super().__init__(env)
+        self.reward_range = (-1, 1)
+
     def reward(self, reward):
         return np.sign(reward)
 
-def monitor(env, name, video=False):
+def monitor(env, name=None, video=False, ref=False):
+    if name is None:
+        name = env.unwrapped.spec.id
     timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')
-    monitor_dir = os.path.join('/tmp/', name + '_' + timestamp)
+    monitor_dir = os.path.join('/tmp/', name + '_' + timestamp + ('_ref' if ref else ''))
     print('Logging to', monitor_dir)
     env = Monitor(env, directory=monitor_dir)
     if not video:
