@@ -4,9 +4,9 @@ import numpy as np
 import tensorflow as tf
 import time
 
-from utils import *
-from wrappers import HistoryWrapper
-from replay_memory_legacy import LegacyReplayMemory
+from .utils import *
+from .wrappers import HistoryWrapper
+from .replay_memory_legacy import LegacyReplayMemory
 
 
 def learn(
