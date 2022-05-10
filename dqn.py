@@ -8,7 +8,6 @@ from .utils import *
 from .wrappers import HistoryWrapper
 from .replay_memory_legacy import LegacyReplayMemory
 
-
 def learn(
         session,
         env,
@@ -25,6 +24,8 @@ def learn(
         grad_clip=None,
         log_every_n_steps=10000,
         mov_avg_size=100,
+        checkpoint_save_path=None,
+        checkpoint_load_path=None,
     ):
 
     assert type(env.observation_space) == gym.spaces.Box
@@ -74,6 +75,11 @@ def learn(
     replay_memory.register_refresh_func(refresh)
 
     session.run(tf.global_variables_initializer())
+    if checkpoint_save_path or checkpoint_load_path:
+        saver = tf.train.Saver(tf.trainable_variables())
+    if checkpoint_load_path:
+        saver.restore(session, checkpoint_load_path)
+
 
     def epsilon_greedy(state, epsilon):
         if np.random.random() < epsilon:
@@ -156,3 +162,5 @@ def learn(
 
     all_rewards = benchmark_rewards + get_episode_rewards(env)
     print('rewards=', all_rewards, sep='')
+    if saver:
+        saver.save(session, f'{checkpoint_save_path}/ckpt')
