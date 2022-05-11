@@ -142,11 +142,12 @@ def monitor(env, name=None, video=False, ref=False):
         env.video_callable = lambda e: False
     return env
 
-def wrap_deepmind(env):
+def wrap_deepmind(env, wrap_reward = True):
     if 'FIRE' in env.unwrapped.get_action_meanings():
         env = FireResetEnv(env)
     env = NoopResetEnv(env, noop_max=20)
     env = EpisodicLifeEnv(env)
-    env = ClippedRewardsWrapper(env)
+    if wrap_reward:
+        env = ClippedRewardsWrapper(env)
     env = ProcessFrame84(env)
     return env

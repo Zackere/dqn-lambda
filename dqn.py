@@ -117,6 +117,8 @@ def learn(
             mean_reward = np.mean(rewards)
             std_reward = np.std(rewards)
             best_mean_reward = max(mean_reward, best_mean_reward)
+            if saver and best_mean_reward == mean_reward:
+                saver.save(session, f'{checkpoint_save_path}/ckpt')
 
             print('Episodes', len(get_episode_rewards(env)))
             print('Exploration', epsilon)
@@ -162,5 +164,3 @@ def learn(
 
     all_rewards = benchmark_rewards + get_episode_rewards(env)
     print('rewards=', all_rewards, sep='')
-    if saver:
-        saver.save(session, f'{checkpoint_save_path}/ckpt')
