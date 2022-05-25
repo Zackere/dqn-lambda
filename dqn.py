@@ -80,7 +80,6 @@ def learn(
     if checkpoint_load_path:
         saver.restore(session, checkpoint_load_path)
 
-
     def epsilon_greedy(state, epsilon):
         if np.random.random() < epsilon:
             action = env.action_space.sample()
@@ -117,7 +116,7 @@ def learn(
             mean_reward = np.mean(rewards)
             std_reward = np.std(rewards)
             best_mean_reward = max(mean_reward, best_mean_reward)
-            if saver and best_mean_reward == mean_reward:
+            if checkpoint_save_path and best_mean_reward == mean_reward:
                 saver.save(session, f'{checkpoint_save_path}/ckpt')
 
             print('Episodes', len(get_episode_rewards(env)))
@@ -150,7 +149,6 @@ def learn(
 
                 if t % train_freq == 0:
                     train()
-
         # Step the environment once
         replay_memory.store_obs(obs)
         state = replay_memory.encode_recent_observation()
